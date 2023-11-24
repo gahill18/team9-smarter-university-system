@@ -1,20 +1,50 @@
 import unittest
 
 from app.controllers.quizzes_controller import QuizzesController
+from datetime import datetime
 
 class QuizzesTest(unittest.TestCase):
 
     def setUp(self):
         # Run tests on non-production data
-        self.ctrl = QuizzesController('quizzes_test.py')
+        self.ctrl = QuizzesController()
         
     def test_expose_failure_01(self):
+        """
+        This function demonstrates a lack of error checking in the add
+        quiz function of the QuizController module. Notice how using an
+        integer instead of a string for the title induces a TypeError on
+        line 63 of quizzes_controller.py
+        """
+        q_id = self.ctrl.add_quiz(0, "<-- bad id", datetime(2001, 1, 24), datetime(2003, 7, 13))
+        self.assertEqual(
+            q_id,
+            None,
+            'The new id should not have been created!'
+        )
+        
+    def test_expose_failure_02(self):
+        """
+        This function demonstrates a lack of error checking in the _save_data
+        function of the QuizzesController module. Adding "None" into the list
+        of quizzes before trying to add another quiz will result in an
+        AttributeError on line 54 of quizzes_controller.py
+        """
+        self.ctrl.quizzes.append(None)
+        q_id = self.ctrl.add_quiz("Good Title", "Good Text", datetime(2001, 1, 24), datetime(2003, 7, 13))
+        quiz = self.ctrl.get_quiz_by_id(q_id)
+        self.assertEqual(
+            quiz.id,
+            q_id,
+            'The newly created quiz ID should match the ID of the queried quiz'
+        )
+    
+    def test_expose_failure_03(self):
         """
         Implement this function and two more that
         execute the code and make it fail.
         """
         self.assertTrue(True, 'Example assertion.')
-        
-
+    
 if __name__ == '__main__':
     unittest.main()
